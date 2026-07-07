@@ -69,7 +69,7 @@
         if (shopParam) document.getElementById('shopName').value = shopParam;
 
         // โหลดข้อมูล Dropdown
-        fetch(GAS_WEB_APP_URL + "?action=getSettings")
+        fetch(GAS_WEB_APP_URL + "?action=getSettings", { redirect: "follow" })
             .then(res => res.json())
             .then(data => {
                 itemsData = data.items;
