@@ -12,7 +12,7 @@
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; margin-top: 20px; background-color: #00B900; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
         button:disabled { background-color: #ccc; }
-        #loading { text-align: center; color: #666; margin-bottom: 15px; }
+        #loading { text-align: center; color: #666; margin-bottom: 15px; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -61,16 +61,26 @@
     let itemsData = [];
 
     window.onload = async function() {
-        await liff.init({ liffId: LIFF_ID });
+        try {
+            await liff.init({ liffId: LIFF_ID });
+        } catch (e) {
+            console.log("LIFF Init Error (ไม่เป็นไรถ้าเปิดบนเบราว์เซอร์ปกติ)");
+        }
         
-        // รับชื่อร้านจาก URL (LINE ส่งมา)
         const urlParams = new URLSearchParams(window.location.search);
         const shopParam = urlParams.get('shop');
         if (shopParam) document.getElementById('shopName').value = shopParam;
 
-        // โหลดข้อมูล Dropdown
+        // 🔍 ปรับปรุงระบบดึงข้อมูลให้แสดง Error ชัดเจน
         fetch(GAS_WEB_APP_URL + "?action=getSettings", { redirect: "follow" })
-            .then(res => res.json())
+            .then(async res => {
+                const text = await res.text(); // อ่านค่าที่ตอบกลับมาแบบดิบๆ
+                try {
+                    return JSON.parse(text); // ลองแปลงเป็น JSON
+                } catch (e) {
+                    throw new Error("ไม่ใช่ JSON! สิ่งที่ Google ส่งมาคือ: " + text.substring(0, 50) + "...");
+                }
+            })
             .then(data => {
                 itemsData = data.items;
                 data.items.forEach(item => document.getElementById('itemName').innerHTML += `<option value="${item.name}">${item.name}</option>`);
@@ -79,16 +89,17 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('inventoryForm').style.display = 'block';
             })
-            .catch(err => document.getElementById('loading').innerText = "❌ โหลดข้อมูลล้มเหลว");
+            .catch(err => {
+                // แสดง Error บนหน้าจอเลย จะได้รู้ว่าพังเพราะอะไร
+                document.getElementById('loading').innerHTML = `<span style="color:red;">❌ เกิดข้อผิดพลาด:<br>${err.message}</span>`;
+            });
     };
 
-    // อัปเดตหน่วยนับอัตโนมัติ
     document.getElementById('itemName').addEventListener('change', function() {
         const matchedItem = itemsData.find(item => item.name === this.value);
         document.getElementById('unit').value = matchedItem ? matchedItem.unit : "";
     });
 
-    // แสดง/ซ่อน จุดที่เบิก
     document.getElementById('transactionType').addEventListener('change', function() {
         const locDiv = document.getElementById('locationDiv');
         const locSelect = document.getElementById('location');
@@ -96,7 +107,6 @@
         else { locDiv.style.display = 'none'; locSelect.required = false; locSelect.value = ""; }
     });
 
-    // กดปุ่มบันทึก
     document.getElementById('inventoryForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
@@ -122,7 +132,8 @@
         .then(result => {
             if (result.status === "success") {
                 alert(result.message);
-                liff.isInClient() ? liff.closeWindow() : window.location.reload();
+                if (typeof liff !== 'undefined' && liff.isInClient()) { liff.closeWindow(); } 
+                else { window.location.reload(); }
             } else {
                 alert("Error: " + result.message);
                 btn.disabled = false; btn.innerText = "💾 บันทึกข้อมูล";
