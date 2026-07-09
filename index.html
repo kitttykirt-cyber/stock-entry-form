@@ -1,4 +1,6 @@
-<!doctype html><html lang="th"><head>
+<!doctype html>
+<html lang="th">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stock Entry Form</title>
@@ -76,12 +78,13 @@
   </div>
 
   <script>
+    // ข้อมูลของคุณที่อัปเดตแล้ว (เพิ่ม brandy glass, ม้วน, แม่บ้าน)
     const DATA = {
       shops: ['Tunnel','808','lucifer','windy beach','bkk'],
       types: ['รับเข้า','เบิกออก'],
-      items: ['pop up','jumbo roll','ถุงขยะ ใหญ่','ถุงขยะ เล็ก','หลอด','ที่เขี่ยบุหรี่','ที่คีปน้ำแข็ง','ไฟแช็ค','ผ้าเย็น','จุกเหล้า','กระดาษม้วน เล็ก','แนปคิ้น','กระดาษ ยาว','rock glass','longdrink glass','shot glass','hiball glass','wine glass','champagne glass','margarita glass','craft glass'],
-      units: ['ลัง','กล่อง','ใบ','ชิ้น','pack','box','อัน'],
-      dispense: ['bar 1','bar 2','bar 3','bar 4','bar 5','bar 6']
+      items: ['pop up','jumbo roll','ถุงขยะ ใหญ่','ถุงขยะ เล็ก','หลอด','ที่เขี่ยบุหรี่','ที่คีปน้ำแข็ง','ไฟแช็ค','ผ้าเย็น','จุกเหล้า','กระดาษม้วน เล็ก','แนปคิ้น','กระดาษ ยาว','rock glass','longdrink glass','shot glass','hiball glass','wine glass','champagne glass','margarita glass','craft glass','brandy glass'],
+      units: ['ลัง','กล่อง','ใบ','ชิ้น','pack','box','อัน','ม้วน'],
+      dispense: ['bar 1','bar 2','bar 3','bar 4','bar 5','bar 6','แม่บ้าน']
     };
 
     let selectedShop = ''; let selectedType = ''; let itemRows = [{ item:'', unit:'', quantity:'', dispense:'' }];
@@ -160,7 +163,7 @@
     }
 
     const form = document.getElementById('entry-form');
-    const submitBtn = document.getElementById('submit-btn');
+    const submitBtn = document.getElementById('submit-btn') || form.querySelector('[type="submit"]');
     const toast = document.getElementById('toast');
     let isSubmitting = false;
 
@@ -190,7 +193,8 @@
         });
       }
 
-      isSubmitting = true; submitBtn.disabled = true; submitBtn.textContent = 'กำลังบันทึก...';
+      isSubmitting = true; 
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'กำลังบันทึก...'; }
       let allOk = true;
 
       // ---------------------------------------------------------
@@ -230,15 +234,17 @@
       } else {
         showToast('เกิดข้อผิดพลาด กรุณาตรวจสอบ URL SheetMonkey');
       }
-      submitBtn.disabled = false; submitBtn.textContent = 'บันทึก';
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'บันทึก'; }
       isSubmitting = false;
     });
 
     function showToast(msg) {
-      document.getElementById('toast-success').textContent = msg;
+      const toastMsg = document.getElementById('toast-success') || toast.querySelector('div');
+      if(toastMsg) toastMsg.textContent = msg;
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 3000);
     }
     lucide.createIcons();
   </script>
-</body></html>
+</body>
+</html>
