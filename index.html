@@ -78,13 +78,12 @@
   </div>
 
   <script>
-    // ข้อมูลของคุณที่อัปเดตแล้ว (เพิ่ม brandy glass, ม้วน, แม่บ้าน)
     const DATA = {
       shops: ['Tunnel','808','lucifer','windy beach','bkk'],
       types: ['รับเข้า','เบิกออก'],
       items: ['pop up','jumbo roll','ถุงขยะ ใหญ่','ถุงขยะ เล็ก','หลอด','ที่เขี่ยบุหรี่','ที่คีปน้ำแข็ง','ไฟแช็ค','ผ้าเย็น','จุกเหล้า','กระดาษม้วน เล็ก','แนปคิ้น','กระดาษ ยาว','rock glass','longdrink glass','shot glass','hiball glass','wine glass','champagne glass','margarita glass','craft glass','brandy glass'],
       units: ['ลัง','กล่อง','ใบ','ชิ้น','pack','box','อัน','ม้วน'],
-      dispense: ['bar 1','bar 2','bar 3','bar 4','bar 5','bar 6','แม่บ้าน']
+      dispense: ['bar 1','bar 2','bar 3','bar 4','bar 5','bar 6','server','แม่บ้าน']
     };
 
     let selectedShop = ''; let selectedType = ''; let itemRows = [{ item:'', unit:'', quantity:'', dispense:'' }];
@@ -174,6 +173,7 @@
 
       const rows = document.querySelectorAll('.item-row');
       const entries = [];
+
       for (let i = 0; i < rows.length; i++) {
         const item = itemRows[i]?.item;
         const unit = itemRows[i]?.unit;
@@ -197,22 +197,18 @@
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'กำลังบันทึก...'; }
       let allOk = true;
 
-      // ---------------------------------------------------------
-      // จุดสำคัญ: เอา URL จาก SheetMonkey มาใส่ในบรรทัดด้านล่างนี้
-      // ---------------------------------------------------------
-      const sheetMonkeyURL = "https://api.sheetmonkey.io/form/7MbuGjTZ5TEwxkteuvXciq"; 
+      // =========================================================
+      // ใส่ URL จาก SheetMonkey มาใส่ที่นี่ที่เดียวเลยครับ
+      const sheetMonkeyURL = "ใส่_URL_ของ_SHEETMONKEY_ที่นี่"; 
+      // =========================================================
 
       for (const entry of entries) {
         try {
           const response = await fetch(sheetMonkeyURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(entry)
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry)
           });
           if (!response.ok) { allOk = false; break; }
-        } catch (error) {
-          allOk = false; break;
-        }
+        } catch (error) { allOk = false; break; }
       }
 
       if (allOk) {
@@ -232,7 +228,7 @@
         bindRowEvents(getRowEl(0), 0);
         showToast('✓ บันทึกสำเร็จ!');
       } else {
-        showToast('เกิดข้อผิดพลาด กรุณาตรวจสอบ URL SheetMonkey');
+        showToast('เกิดข้อผิดพลาด กรุณาตรวจสอบ URL');
       }
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'บันทึก'; }
       isSubmitting = false;
