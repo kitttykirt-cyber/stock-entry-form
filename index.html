@@ -204,14 +204,15 @@
 
       for (const entry of entries) {
   try {
+    const body = new URLSearchParams();
+    body.append('payload', JSON.stringify(entry));
+
     await fetch(sheetMonkeyURL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(entry)
+      body: body
     });
+
   } catch (error) {
     console.error('บันทึกไม่สำเร็จ:', error);
     allOk = false;
